@@ -1,0 +1,8 @@
+name: xAuth
+version: '1.0-SNAPSHOT'
+main: com.xauth.xAuth
+api-version: 1.19
+commands:
+  auth:
+    usage: auth
+    description: open the auth gui
