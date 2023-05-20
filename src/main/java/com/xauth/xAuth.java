@@ -19,6 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.xephi.authme.api.v3.AuthMeApi;
+
+import com.xauth.listeners.onGUIClose;
+import com.xauth.listeners.onLogoutCommand;
+import com.xauth.listeners.onUnregisterCommand;
+
+
 public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
 
     private List<Integer> clickedSlots;
@@ -26,9 +32,11 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
     @Override
     public void onEnable() {
         getLogger().info("xAuth plugin has been enabled.");
-        getCommand("auth").setExecutor(this);
         Bukkit.getPluginManager().registerEvents(this, this);
         clickedSlots = new ArrayList<>();
+        Bukkit.getPluginManager().registerEvents(new onGUIClose(this), this);
+        Bukkit.getPluginManager().registerEvents(new onLogoutCommand(this), this);
+        Bukkit.getPluginManager().registerEvents(new onUnregisterCommand(this), this);
     }
 
     @Override
@@ -38,7 +46,7 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
 
 
     //PIN GUI inventory Creation
-    private void openDispenserGUI(Player player) {
+    public void openDispenserGUI(Player player) {
         Inventory dispenserGUI = Bukkit.createInventory(null, InventoryType.DISPENSER, "PIN GUI");
 
         ItemStack diamond = new ItemStack(Material.DIAMOND);
@@ -46,11 +54,10 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         for (int i = 0; i < dispenserGUI.getSize(); i++) {
             dispenserGUI.setItem(i, diamond);
         }
-
         player.openInventory(dispenserGUI);
     }
 
-    //Check to see if the player is logged in, If not, open login GUI. The task has 6 ticks of delay to let authMe have priority.
+    //Check to see if the player is logged in, If not, open login GUI. The task has 3 ticks of delay to let authMe have priority.
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -64,12 +71,10 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
             player.sendMessage("[xAuth] You are not logged in. Login using GUI");
             openDispenserGUI(player);
         }
-
         }, 6);
-
     }
 
-    //If Login GUI is open, Start recording PIN into an array
+    // If Login GUI is open, start recording PIN into an array
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getView().getTitle().equals("PIN GUI")) {
@@ -83,16 +88,16 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
 
                 // Start combining all the numbers into a string
                 if (clickedSlots.size() >= 4) {
-                    StringBuilder pinBuilder = new StringBuilder("");
+                    StringBuilder pinBuilder = new StringBuilder();
                     for (int i = 0; i < 4; i++) {
                         pinBuilder.append(clickedSlots.get(i));
                     }
                     String pin = pinBuilder.toString();
                     player.sendMessage("Your Pin is " + pin); // Send PIN Message
                     clickedSlots.clear();
-                    player.closeInventory(); //closeInventory once 4 digit PIN has been typed out.
+                    player.closeInventory(); // closeInventory once 4 digit PIN has been typed out.
 
-                    //If player is already registered, use /login command, if not, use /register command
+                    // If player is already registered, use /login command, if not, use /register command
                     if (AuthMeApi.getInstance().isRegistered(player.getName())) {
                         Bukkit.dispatchCommand(player, "login " + pin);
                     } else {
@@ -101,5 +106,8 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
                 }
             }
         }
+    }
+    public List<Integer> getClickedSlots() {
+        return clickedSlots;
     }
 }

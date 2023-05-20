@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="AuthMe-5.6.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://D:/MinecraftMumbai/MinecraftProj/Library/AuthMe-5.6.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://D:/MinecraftMumbai/MinecraftProj/Library/AuthMe-5.6.0-SNAPSHOT.jar!/fr/xephi/authme/libs" />
+    </SOURCES>
+  </library>
+</component>
