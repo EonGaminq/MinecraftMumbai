@@ -48,9 +48,7 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
     //PIN GUI inventory Creation
     public void openDispenserGUI(Player player) {
         Inventory dispenserGUI = Bukkit.createInventory(null, InventoryType.DISPENSER, "PIN GUI");
-
         ItemStack diamond = new ItemStack(Material.DIAMOND);
-
         for (int i = 0; i < dispenserGUI.getSize(); i++) {
             dispenserGUI.setItem(i, diamond);
         }
@@ -63,15 +61,10 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         Player player = event.getPlayer();
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.runTaskLater(this, () -> {
-        if (AuthMeApi.getInstance().isAuthenticated(player)) {
-            // Player is already logged in
-            player.sendMessage("[xAuth] You are already logged in, Skipping Login GUI");
-        } else {
-            // Player is not logged in
-            player.sendMessage("[xAuth] You are not logged in. Login using GUI");
+        if (!AuthMeApi.getInstance().isAuthenticated(player)) {
             openDispenserGUI(player);
-        }
-        }, 6);
+            }
+        }, 10);
     }
 
     // If Login GUI is open, start recording PIN into an array
@@ -84,8 +77,6 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
                 int slot = event.getRawSlot() + 1;
                 Player player = (Player) event.getWhoClicked();
                 clickedSlots.add(slot);
-                player.sendMessage("Clicked on slot: " + slot);
-
                 // Start combining all the numbers into a string
                 if (clickedSlots.size() >= 4) {
                     StringBuilder pinBuilder = new StringBuilder();
@@ -93,15 +84,14 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
                         pinBuilder.append(clickedSlots.get(i));
                     }
                     String pin = pinBuilder.toString();
-                    player.sendMessage("Your Pin is " + pin); // Send PIN Message
                     clickedSlots.clear();
                     player.closeInventory(); // closeInventory once 4 digit PIN has been typed out.
-
                     // If player is already registered, use /login command, if not, use /register command
                     if (AuthMeApi.getInstance().isRegistered(player.getName())) {
                         Bukkit.dispatchCommand(player, "login " + pin);
                     } else {
                         Bukkit.dispatchCommand(player, "register " + pin + " " + pin);
+                        player.sendMessage("Please note your pin is " + pin); // Send PIN Message
                     }
                 }
             }

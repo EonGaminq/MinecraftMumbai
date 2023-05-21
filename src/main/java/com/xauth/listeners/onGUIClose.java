@@ -30,7 +30,7 @@ public class onGUIClose implements Listener {
                 if (!AuthMeApi.getInstance().isAuthenticated(player)) {
                     plugin.openDispenserGUI(player);
                 }
-            }, 10);
+            }, 6);
         }
     }
 }

@@ -25,16 +25,16 @@ public class onUnregisterCommand implements Listener {
             String[] args = command.split(" ");
             BukkitScheduler scheduler = plugin.getServer().getScheduler();
             scheduler.scheduleSyncDelayedTask(plugin, () -> {
-            if (args.length == 2) {
-                // Admin unregistering another player
-                String targetPlayerName = args[2];
-                Player targetPlayer = plugin.getServer().getPlayerExact(targetPlayerName);
-                if (targetPlayer != null && targetPlayer.isOnline()) {
-                    player.sendMessage("You've been unregistered by an Admin" + targetPlayerName);
-                    plugin.openDispenserGUI(targetPlayer);
+                if (args.length == 3) {
+                    // Admin unregistering another player
+                    String targetPlayerName = args[2];
+                    Player targetPlayer = plugin.getServer().getPlayerExact(targetPlayerName);
+                    if (targetPlayer != null && targetPlayer.isOnline()) {
+                        plugin.openDispenserGUI(targetPlayer);
                     }
                 }
             }, 6);
+
 
         } else if (command.startsWith("/unregister ")) {
             String[] args = command.split(" ");
@@ -46,7 +46,7 @@ public class onUnregisterCommand implements Listener {
                     plugin.openDispenserGUI(player);
                 }
               }
-            }, 2);
+            }, 6);
         }
     }
 

@@ -24,7 +24,7 @@ public class onLogoutCommand implements Listener {
             scheduler.scheduleSyncDelayedTask(plugin, () -> {
             if (!AuthMeApi.getInstance().isAuthenticated(player)) {
                 plugin.openDispenserGUI(player); }
-            }, 2);
+            }, 6);
         }
     }
 }
