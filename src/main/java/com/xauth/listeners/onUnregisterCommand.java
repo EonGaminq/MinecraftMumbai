@@ -30,7 +30,7 @@ public class onUnregisterCommand implements Listener {
                     String targetPlayerName = args[2];
                     Player targetPlayer = plugin.getServer().getPlayerExact(targetPlayerName);
                     if (targetPlayer != null && targetPlayer.isOnline()) {
-                        plugin.openDispenserGUI(targetPlayer);
+                        plugin.openLoginGUI(targetPlayer);
                     }
                 }
             }, 6);
@@ -43,7 +43,7 @@ public class onUnregisterCommand implements Listener {
             if (args.length == 2) {
                 // Player unregistering themselves
                 if (!AuthMeApi.getInstance().isAuthenticated(player)) {
-                    plugin.openDispenserGUI(player);
+                    plugin.openLoginGUI(player);
                 }
               }
             }, 6);

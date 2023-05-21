@@ -23,7 +23,7 @@ public class onLogoutCommand implements Listener {
             BukkitScheduler scheduler = plugin.getServer().getScheduler();
             scheduler.scheduleSyncDelayedTask(plugin, () -> {
             if (!AuthMeApi.getInstance().isAuthenticated(player)) {
-                plugin.openDispenserGUI(player); }
+                plugin.openLoginGUI(player); }
             }, 6);
         }
     }

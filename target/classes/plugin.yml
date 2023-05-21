@@ -3,6 +3,10 @@ version: '1.0-SNAPSHOT'
 main: com.xauth.xAuth
 api-version: 1.19
 commands:
-  auth:
-    usage: auth
-    description: open the auth gui
+  xauth:
+    description: Opens the login GUI
+    usage: /xauth [reload]
+permissions:
+  xauth.reload:
+    description: Allows reloading the plugin configuration
+    default: op

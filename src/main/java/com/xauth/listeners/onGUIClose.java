@@ -12,15 +12,17 @@ import com.xauth.xAuth;
 public class onGUIClose implements Listener {
 
     private final xAuth plugin;
+    private final String guiTitle; // Add a field to store the GUI title
 
-    public onGUIClose(xAuth plugin) {
+    public onGUIClose(xAuth plugin, String guiTitle) {
         this.plugin = plugin;
+        this.guiTitle = guiTitle; // Assign the GUI title from the constructor parameter
     }
 
     // If the PIN GUI is closed and the player is not authenticated, reopen the GUI with a delay of 1 tick
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (event.getView().getTitle().equals("PIN GUI")) {
+        if (event.getView().getTitle().equals(guiTitle)) {
             Player player = (Player) event.getPlayer();
             BukkitScheduler scheduler = plugin.getServer().getScheduler();
             scheduler.scheduleSyncDelayedTask(plugin, () -> {
@@ -28,7 +30,7 @@ public class onGUIClose implements Listener {
                     plugin.getClickedSlots().clear(); // Clear the recorded PIN digits using the plugin's clickedSlots list
                 }
                 if (!AuthMeApi.getInstance().isAuthenticated(player)) {
-                    plugin.openDispenserGUI(player);
+                    plugin.openLoginGUI(player);
                 }
             }, 6);
         }

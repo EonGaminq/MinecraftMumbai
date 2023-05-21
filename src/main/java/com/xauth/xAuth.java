@@ -1,8 +1,11 @@
 package com.xauth;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,6 +16,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.inventory.meta.ItemMeta;
+
 
 
 import java.util.ArrayList;
@@ -28,15 +33,18 @@ import com.xauth.listeners.onUnregisterCommand;
 public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
 
     private List<Integer> clickedSlots;
-
+    private ItemStack fillItem;
     @Override
     public void onEnable() {
-        getLogger().info("xAuth plugin has been enabled.");
-        Bukkit.getPluginManager().registerEvents(this, this);
+        getConfig().options().copyDefaults(true);
+        saveConfig();
         clickedSlots = new ArrayList<>();
-        Bukkit.getPluginManager().registerEvents(new onGUIClose(this), this);
+        fillItem = createFillItem();
+        Bukkit.getPluginManager().registerEvents(this, this);
+        Bukkit.getPluginManager().registerEvents(new onGUIClose(this, getConfig().getString("GUITitle")), this);
         Bukkit.getPluginManager().registerEvents(new onLogoutCommand(this), this);
         Bukkit.getPluginManager().registerEvents(new onUnregisterCommand(this), this);
+        getLogger().info("xAuth plugin has been enabled.");
     }
 
     @Override
@@ -44,15 +52,31 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         getLogger().info("xAuth plugin has been disabled.");
     }
 
+    String guiTitle = getConfig().getString("GUITitle");
+
+
+    // Create the fill item with custom model data and slot number as display name
+    private ItemStack createFillItem() {
+        ItemStack item = new ItemStack(Material.MAP);
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setCustomModelData(1010);
+        itemMeta.setDisplayName(ChatColor.RESET + "");
+        item.setItemMeta(itemMeta);
+        return item;
+    }
+
 
     //PIN GUI inventory Creation
-    public void openDispenserGUI(Player player) {
-        Inventory dispenserGUI = Bukkit.createInventory(null, InventoryType.DISPENSER, "PIN GUI");
-        ItemStack diamond = new ItemStack(Material.DIAMOND);
-        for (int i = 0; i < dispenserGUI.getSize(); i++) {
-            dispenserGUI.setItem(i, diamond);
+    public void openLoginGUI(Player player) {
+        Inventory LoginGUI = Bukkit.createInventory(null, InventoryType.DROPPER, guiTitle);
+        for (int i = 0; i < LoginGUI.getSize(); i++) {
+            ItemStack fillItemClone = fillItem.clone();
+            ItemMeta itemMeta = fillItemClone.getItemMeta();
+            itemMeta.setDisplayName(ChatColor.RESET + String.valueOf(i + 1));
+            fillItemClone.setItemMeta(itemMeta);
+            LoginGUI.setItem(i, fillItemClone);
         }
-        player.openInventory(dispenserGUI);
+        player.openInventory(LoginGUI);
     }
 
     //Check to see if the player is logged in, If not, open login GUI. The task has 3 ticks of delay to let authMe have priority.
@@ -61,8 +85,8 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         Player player = event.getPlayer();
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.runTaskLater(this, () -> {
-        if (!AuthMeApi.getInstance().isAuthenticated(player)) {
-            openDispenserGUI(player);
+            if (!AuthMeApi.getInstance().isAuthenticated(player)) {
+                openLoginGUI(player);
             }
         }, 10);
     }
@@ -70,10 +94,10 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
     // If Login GUI is open, start recording PIN into an array
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getView().getTitle().equals("PIN GUI")) {
+        if (event.getView().getTitle().equals(guiTitle)) {
             event.setCancelled(true);
             ItemStack clickedItem = event.getCurrentItem();
-            if (clickedItem != null && clickedItem.getType() == Material.DIAMOND) {
+            if (clickedItem != null) {
                 int slot = event.getRawSlot() + 1;
                 Player player = (Player) event.getWhoClicked();
                 clickedSlots.add(slot);
@@ -85,17 +109,32 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
                     }
                     String pin = pinBuilder.toString();
                     clickedSlots.clear();
-                    player.closeInventory(); // closeInventory once 4 digit PIN has been typed out.
-                    // If player is already registered, use /login command, if not, use /register command
+                    player.closeInventory(); // Close inventory once 4-digit PIN has been typed out.
+                    // If the player is already registered, use /login command; if not, use /register command
                     if (AuthMeApi.getInstance().isRegistered(player.getName())) {
                         Bukkit.dispatchCommand(player, "login " + pin);
                     } else {
                         Bukkit.dispatchCommand(player, "register " + pin + " " + pin);
-                        player.sendMessage("Please note your pin is " + pin); // Send PIN Message
+                        player.sendMessage("Please note your PIN is " + pin); // Send PIN Message
                     }
                 }
             }
         }
+    }
+    // xAuth command to open the GUI or reload the config
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+                reloadConfig();
+                player.sendMessage("Config reloaded.");
+                return true;
+            }
+            openLoginGUI(player);
+            return true;
+        }
+        return false;
     }
     public List<Integer> getClickedSlots() {
         return clickedSlots;
