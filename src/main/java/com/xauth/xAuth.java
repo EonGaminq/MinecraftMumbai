@@ -14,9 +14,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
+import org.bukkit.Sound;
+
 
 
 
@@ -30,6 +32,7 @@ import com.xauth.listeners.onLogoutCommand;
 import com.xauth.listeners.onUnregisterCommand;
 
 
+
 public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
 
     private List<Integer> clickedSlots;
@@ -41,7 +44,7 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         clickedSlots = new ArrayList<>();
         fillItem = createFillItem();
         Bukkit.getPluginManager().registerEvents(this, this);
-        Bukkit.getPluginManager().registerEvents(new onGUIClose(this, getConfig().getString("GUITitle")), this);
+        Bukkit.getPluginManager().registerEvents(new onGUIClose(this, getConfig().getString("LoginTitle")), this);
         Bukkit.getPluginManager().registerEvents(new onLogoutCommand(this), this);
         Bukkit.getPluginManager().registerEvents(new onUnregisterCommand(this), this);
         getLogger().info("xAuth plugin has been enabled.");
@@ -52,7 +55,7 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         getLogger().info("xAuth plugin has been disabled.");
     }
 
-    String guiTitle = getConfig().getString("GUITitle");
+    String loginTitle = getConfig().getString("LoginTitle");
 
 
     // Create the fill item with custom model data and slot number as display name
@@ -68,7 +71,7 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
 
     //PIN GUI inventory Creation
     public void openLoginGUI(Player player) {
-        Inventory LoginGUI = Bukkit.createInventory(null, InventoryType.DROPPER, guiTitle);
+        Inventory LoginGUI = Bukkit.createInventory(null, InventoryType.DROPPER, loginTitle);
         for (int i = 0; i < LoginGUI.getSize(); i++) {
             ItemStack fillItemClone = fillItem.clone();
             ItemMeta itemMeta = fillItemClone.getItemMeta();
@@ -79,28 +82,33 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         player.openInventory(LoginGUI);
     }
 
-    //Check to see if the player is logged in, If not, open login GUI. The task has 3 ticks of delay to let authMe have priority.
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void onResourcePackStatus(PlayerResourcePackStatusEvent event) {
         Player player = event.getPlayer();
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        scheduler.runTaskLater(this, () -> {
+        Status status = event.getStatus();
+        if (status == Status.SUCCESSFULLY_LOADED) {
             if (!AuthMeApi.getInstance().isAuthenticated(player)) {
                 openLoginGUI(player);
             }
-        }, 10);
+            if (AuthMeApi.getInstance().isAuthenticated(player)) {
+                return;
+            }
+        } else if (status == Status.DECLINED || status == Status.FAILED_DOWNLOAD) {
+            player.kickPlayer("Failed to load ResourcePack, Please log in again.");
+        }
     }
 
     // If Login GUI is open, start recording PIN into an array
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getView().getTitle().equals(guiTitle)) {
+        if (event.getView().getTitle().equals(loginTitle)) {
             event.setCancelled(true);
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem != null) {
                 int slot = event.getRawSlot() + 1;
                 Player player = (Player) event.getWhoClicked();
-                clickedSlots.add(slot);
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
+                        clickedSlots.add(slot);
                 // Start combining all the numbers into a string
                 if (clickedSlots.size() >= 4) {
                     StringBuilder pinBuilder = new StringBuilder();
@@ -115,7 +123,9 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
                         Bukkit.dispatchCommand(player, "login " + pin);
                     } else {
                         Bukkit.dispatchCommand(player, "register " + pin + " " + pin);
-                        player.sendMessage("Please note your PIN is " + pin); // Send PIN Message
+                    }
+                    if (AuthMeApi.getInstance().isAuthenticated(player)) {
+                        player.sendMessage("码 Registered Successfully! Your PIN is §x§8§3§d§1§3§0" + pin); // Send PIN Message
                     }
                 }
             }
