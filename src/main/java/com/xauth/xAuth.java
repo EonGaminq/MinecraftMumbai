@@ -56,6 +56,7 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
     }
 
     String loginTitle = getConfig().getString("LoginTitle");
+    String registerTitle = getConfig().getString("RegisterTitle");
 
 
     // Create the fill item with custom model data and slot number as display name
@@ -68,8 +69,7 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         return item;
     }
 
-
-    //PIN GUI inventory Creation
+    //Login PIN GUI inventory Creation
     public void openLoginGUI(Player player) {
         Inventory LoginGUI = Bukkit.createInventory(null, InventoryType.DROPPER, loginTitle);
         for (int i = 0; i < LoginGUI.getSize(); i++) {
