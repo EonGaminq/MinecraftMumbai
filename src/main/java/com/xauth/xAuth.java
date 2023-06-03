@@ -19,14 +19,10 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status;
 import org.bukkit.Sound;
 
-
-
-
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.xephi.authme.api.v3.AuthMeApi;
-
 import com.xauth.listeners.onGUIClose;
 import com.xauth.listeners.onLogoutCommand;
 import com.xauth.listeners.onUnregisterCommand;
@@ -44,7 +40,7 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         clickedSlots = new ArrayList<>();
         fillItem = createFillItem();
         Bukkit.getPluginManager().registerEvents(this, this);
-        Bukkit.getPluginManager().registerEvents(new onGUIClose(this, getConfig().getString("LoginTitle")), this);
+        Bukkit.getPluginManager().registerEvents(new onGUIClose(this, loginTitle, registerTitle), this);
         Bukkit.getPluginManager().registerEvents(new onLogoutCommand(this), this);
         Bukkit.getPluginManager().registerEvents(new onUnregisterCommand(this), this);
         getLogger().info("xAuth plugin has been enabled.");
@@ -69,6 +65,21 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         return item;
     }
 
+    //Register PIN GUI inventory Creation
+    public void openRegisterGUI(Player player) {
+        System.out.println("openRegisterGUI() called for player " + player.getName());
+        Inventory RegisterGUI = Bukkit.createInventory(null, InventoryType.DROPPER, registerTitle);
+        for (int i = 0; i < RegisterGUI.getSize(); i++) {
+            ItemStack fillItemClone = fillItem.clone();
+            ItemMeta itemMeta = fillItemClone.getItemMeta();
+            itemMeta.setDisplayName(ChatColor.RESET + String.valueOf(i + 1));
+            fillItemClone.setItemMeta(itemMeta);
+            RegisterGUI.setItem(i, fillItemClone);
+        }
+        player.openInventory(RegisterGUI);
+        System.out.println("Opening GUI with title " + registerTitle);
+    }
+
     //Login PIN GUI inventory Creation
     public void openLoginGUI(Player player) {
         Inventory LoginGUI = Bukkit.createInventory(null, InventoryType.DROPPER, loginTitle);
@@ -87,7 +98,10 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         Player player = event.getPlayer();
         Status status = event.getStatus();
         if (status == Status.SUCCESSFULLY_LOADED) {
-            if (!AuthMeApi.getInstance().isAuthenticated(player)) {
+            if (!AuthMeApi.getInstance().isRegistered(player.getName())) {
+                openRegisterGUI(player);
+            }
+            if (AuthMeApi.getInstance().isRegistered(player.getName()) && !AuthMeApi.getInstance().isAuthenticated(player)) {
                 openLoginGUI(player);
             }
             if (AuthMeApi.getInstance().isAuthenticated(player)) {
@@ -101,7 +115,8 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
     // If Login GUI is open, start recording PIN into an array
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getView().getTitle().equals(loginTitle)) {
+        String inventoryTitle = event.getView().getTitle();
+        if (inventoryTitle.equals(loginTitle) || inventoryTitle.equals(registerTitle)) {
             event.setCancelled(true);
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem != null) {
