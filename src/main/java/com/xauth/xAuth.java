@@ -123,7 +123,7 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
                 int slot = event.getRawSlot() + 1;
                 Player player = (Player) event.getWhoClicked();
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
-                        clickedSlots.add(slot);
+                clickedSlots.add(slot);
                 // Start combining all the numbers into a string
                 if (clickedSlots.size() >= 4) {
                     StringBuilder pinBuilder = new StringBuilder();

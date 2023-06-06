@@ -4,9 +4,11 @@ main: com.xauth.xAuth
 api-version: 1.19
 commands:
   xauth:
-    description: Opens the login GUI
-    usage: /xauth [reload]
+    description: Open the login GUI or reload the config
+    usage: /xauth <reload|debug>
+    permission: xauth.use
+
 permissions:
-  xauth.reload:
-    description: Allows reloading the plugin configuration
-    default: op
+  xauth.use:
+    description: Allows players to use the /xauth command
+    default: true
