@@ -1,5 +1,7 @@
 package com.xauth.listeners;
 
+import com.xauth.gui.LoginGUI;
+import com.xauth.gui.RegisterGUI;
 import com.xauth.xAuth;
 import fr.xephi.authme.api.v3.AuthMeApi;
 import org.bukkit.entity.Player;
@@ -11,9 +13,11 @@ import org.bukkit.scheduler.BukkitScheduler;
 public class onUnregisterCommand implements Listener {
 
     private final xAuth plugin;
+    private final RegisterGUI registerGUI;
 
-    public onUnregisterCommand(xAuth plugin) {
+    public onUnregisterCommand(xAuth plugin, RegisterGUI registerGUI) {
         this.plugin = plugin;
+        this.registerGUI = registerGUI;
     }
 
     @EventHandler
@@ -30,7 +34,7 @@ public class onUnregisterCommand implements Listener {
                     String targetPlayerName = args[2];
                     Player targetPlayer = plugin.getServer().getPlayerExact(targetPlayerName);
                     if (targetPlayer != null && targetPlayer.isOnline()) {
-                        plugin.openRegisterGUI(targetPlayer);
+                        registerGUI.open(player);
                     }
                 }
             }, 6);
@@ -40,12 +44,12 @@ public class onUnregisterCommand implements Listener {
             String[] args = command.split(" ");
             BukkitScheduler scheduler = plugin.getServer().getScheduler();
             scheduler.scheduleSyncDelayedTask(plugin, () -> {
-            if (args.length == 2) {
-                // Player unregistering themselves
-                if (!AuthMeApi.getInstance().isAuthenticated(player)) {
-                    plugin.openRegisterGUI(player);
+                if (args.length == 2) {
+                    // Player unregistering themselves
+                    if (!AuthMeApi.getInstance().isAuthenticated(player)) {
+                        registerGUI.open(player);
+                    }
                 }
-              }
             }, 6);
         }
     }

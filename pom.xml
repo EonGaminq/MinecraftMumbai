@@ -35,7 +35,7 @@
                     <relocations>
                         <relocation>
                             <pattern>com.cryptomorin</pattern>
-                            <shadedPattern>com.xauth.util</shadedPattern>
+                            <shadedPattern>com.xauth.utils</shadedPattern>
                         </relocation>
                     </relocations>
                     <filters>
