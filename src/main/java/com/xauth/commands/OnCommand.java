@@ -5,6 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+
 import com.xauth.gui.LoginGUI;
 import com.xauth.xAuth;
 
@@ -24,6 +25,7 @@ public class OnCommand implements CommandExecutor {
             Player player = (Player) sender;
             if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
                 plugin.reloadConfig();
+                plugin.getGuiUtils().loadTitles(plugin.getConfig()); // Reload the titles from the config
                 player.sendMessage("Config reloaded.");
                 return true;
             }
@@ -34,6 +36,7 @@ public class OnCommand implements CommandExecutor {
         } else {
             if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
                 plugin.reloadConfig();
+                plugin.getGuiUtils().loadTitles(plugin.getConfig()); // Reload the titles from the config
                 sender.sendMessage("Config reloaded.");
                 return true;
             }

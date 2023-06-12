@@ -1,6 +1,5 @@
 package com.xauth.listeners;
 
-import com.xauth.gui.LoginGUI;
 import com.xauth.gui.RegisterGUI;
 import com.xauth.xAuth;
 import fr.xephi.authme.api.v3.AuthMeApi;
