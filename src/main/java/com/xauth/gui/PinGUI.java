@@ -9,20 +9,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.xauth.utils.GUIUtils;
 
+public class PinGUI {
+    private final GUIUtils guiUtils;
 
-public class LoginGUI {
-    private String loginTitle;
-    private GUIUtils guiUtils;
-
-
-    public LoginGUI(String loginTitle, GUIUtils guiUtils) {
-        this.loginTitle = loginTitle;
+    public PinGUI(GUIUtils guiUtils) {
         this.guiUtils = guiUtils;
     }
 
     public void open(Player player) {
-        Inventory loginGUI = Bukkit.createInventory(null, 27, loginTitle);
-        for (int i = 0; i < loginGUI.getSize(); i++) {
+        Inventory pinGui = Bukkit.createInventory(null, 27, guiUtils.getPinGUITitle());
+        for (int i = 0; i < pinGui.getSize(); i++) {
             ItemStack fillItemClone;
             if (isWithinClickableArea(i) || isFillItemSlot(i)) {
                 fillItemClone = guiUtils.createFillItem();
@@ -30,16 +26,16 @@ public class LoginGUI {
                 int convertedSlot = guiUtils.convertRawSlot(i);
                 String symbol = Integer.toString(convertedSlot);
                 String displayName = ChatColor.RESET + symbol;
+                assert itemMeta != null;
                 itemMeta.setDisplayName(displayName);
                 fillItemClone.setItemMeta(itemMeta);
             } else {
                 fillItemClone = null; // Empty slot outside clickable area
             }
-            loginGUI.setItem(i, fillItemClone);
+            pinGui.setItem(i, fillItemClone);
         }
-        player.openInventory(loginGUI);
+        player.openInventory(pinGui);
     }
-
 
     private boolean isWithinClickableArea(int slot) {
         int row = slot / 9;
@@ -51,3 +47,4 @@ public class LoginGUI {
         return slot == 3 || slot == 4 || slot == 5;
     }
 }
+

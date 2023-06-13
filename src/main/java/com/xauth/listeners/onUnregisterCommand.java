@@ -1,6 +1,7 @@
 package com.xauth.listeners;
 
-import com.xauth.gui.RegisterGUI;
+import com.xauth.gui.PinGUI;
+import com.xauth.utils.GUIUtils;
 import com.xauth.xAuth;
 import fr.xephi.authme.api.v3.AuthMeApi;
 import org.bukkit.entity.Player;
@@ -9,14 +10,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.scheduler.BukkitScheduler;
 
+
 public class onUnregisterCommand implements Listener {
 
     private final xAuth plugin;
-    private final RegisterGUI registerGUI;
+    private final GUIUtils guiUtils;
+    private final PinGUI pinGUI;
 
-    public onUnregisterCommand(xAuth plugin, RegisterGUI registerGUI) {
+    public onUnregisterCommand(xAuth plugin, GUIUtils guiUtils, PinGUI pinGUI) {
         this.plugin = plugin;
-        this.registerGUI = registerGUI;
+        this.guiUtils = guiUtils;
+        this.pinGUI = pinGUI;
     }
 
     @EventHandler
@@ -33,7 +37,8 @@ public class onUnregisterCommand implements Listener {
                     String targetPlayerName = args[2];
                     Player targetPlayer = plugin.getServer().getPlayerExact(targetPlayerName);
                     if (targetPlayer != null && targetPlayer.isOnline()) {
-                        registerGUI.open(player);
+                        guiUtils.setPinGUITitle(guiUtils.getRegisterTitle());
+                        pinGUI.open(player);
                     }
                 }
             }, 6);
@@ -46,7 +51,8 @@ public class onUnregisterCommand implements Listener {
                 if (args.length == 2) {
                     // Player unregistering themselves
                     if (!AuthMeApi.getInstance().isAuthenticated(player)) {
-                        registerGUI.open(player);
+                        guiUtils.setPinGUITitle(guiUtils.getRegisterTitle());
+                        pinGUI.open(player);
                     }
                 }
             }, 6);

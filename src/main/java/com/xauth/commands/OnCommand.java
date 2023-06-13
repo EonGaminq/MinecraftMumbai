@@ -1,50 +1,69 @@
 package com.xauth.commands;
 
+import com.xauth.gui.PinGUI;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
-import com.xauth.gui.LoginGUI;
 import com.xauth.xAuth;
 
+@SuppressWarnings("NullableProblems")
 public class OnCommand implements CommandExecutor {
 
     private final xAuth plugin;
-    private final LoginGUI loginGUI;
 
-    public OnCommand(xAuth plugin, LoginGUI loginGUI) {
+    public OnCommand(xAuth plugin) {
         this.plugin = plugin;
-        this.loginGUI = loginGUI;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-                plugin.reloadConfig();
-                plugin.getGuiUtils().loadTitles(plugin.getConfig()); // Reload the titles from the config
+        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            plugin.reloadConfig();
+            plugin.getGuiUtils().loadTitles(plugin.getConfig()); // Reload the titles from the config
+
+            String loginTitle = plugin.getGuiUtils().getLoginTitle();
+            String registerTitle = plugin.getGuiUtils().getRegisterTitle();
+
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
                 player.sendMessage("Config reloaded.");
-                return true;
-            }
-            if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
-                loginGUI.open(player);
-                return true;
-            }
-        } else {
-            if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-                plugin.reloadConfig();
-                plugin.getGuiUtils().loadTitles(plugin.getConfig()); // Reload the titles from the config
+                player.sendMessage("Updated Login Title: " + loginTitle);
+                player.sendMessage("Updated Register Title: " + registerTitle);
+            } else {
                 sender.sendMessage("Config reloaded.");
-                return true;
+                sender.sendMessage("Updated Login Title: " + loginTitle);
+                sender.sendMessage("Updated Register Title: " + registerTitle);
             }
-            if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
-                sender.sendMessage("The debug command can only be used by players.");
+
+            return true;
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("debug")) {
+            String argument = args[1];
+
+            if (argument.equalsIgnoreCase("login")) {
+                plugin.getGuiUtils().setPinGUITitle(plugin.getGuiUtils().getLoginTitle());
+                PinGUI pinGUI = new PinGUI(plugin.getGuiUtils());
+
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    pinGUI.open(player);
+                }
+
+                return true;
+            } else if (argument.equalsIgnoreCase("register")) {
+                plugin.getGuiUtils().setPinGUITitle(plugin.getGuiUtils().getRegisterTitle());
+                PinGUI pinGUI = new PinGUI(plugin.getGuiUtils());
+
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    pinGUI.open(player);
+                }
+
                 return true;
             }
         }
+
         return false;
     }
 }

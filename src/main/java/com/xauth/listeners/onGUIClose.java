@@ -1,5 +1,6 @@
 package com.xauth.listeners;
 
+import com.xauth.gui.PinGUI;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -7,25 +8,21 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import fr.xephi.authme.api.v3.AuthMeApi;
-import com.xauth.gui.LoginGUI;
-import com.xauth.gui.RegisterGUI;
 import com.xauth.utils.GUIUtils;
 import com.xauth.xAuth;
+
 
 public class onGUIClose implements Listener {
 
     private final xAuth plugin;
-    private final RegisterGUI registerGUI;
-    private final LoginGUI loginGUI;
     private final GUIUtils guiUtils;
+    private final PinGUI pinGUI;
 
 
-
-    public onGUIClose(xAuth plugin, LoginGUI loginGUI, RegisterGUI registerGUI, GUIUtils guiUtils) {
+    public onGUIClose(xAuth plugin, GUIUtils guiUtils, PinGUI pinGUI) {
         this.plugin = plugin;
-        this.loginGUI = loginGUI;
-        this.registerGUI = registerGUI;
         this.guiUtils = guiUtils;
+        this.pinGUI = pinGUI;
     }
 
     // If the PIN GUI is closed and the player is not authenticated, reopen the GUI with a delay of 1 tick
@@ -43,11 +40,11 @@ public class onGUIClose implements Listener {
                     guiUtils.getClickedSlots().clear(); // Clear the recorded PIN digits using the GUIUtils' clickedSlots list
                 }
                 if (!AuthMeApi.getInstance().isRegistered(player.getName())) {
-                    registerGUI.open(player);
+                    guiUtils.setPinGUITitle(guiUtils.getRegisterTitle());
+                    pinGUI.open(player);
                 } else if (!AuthMeApi.getInstance().isAuthenticated(player)) {
-                    loginGUI.open(player);
-                } else {
-                    return;
+                    guiUtils.setPinGUITitle(guiUtils.getLoginTitle());
+                    pinGUI.open(player);
                 }
             }, 6);
         }

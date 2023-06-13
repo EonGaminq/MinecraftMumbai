@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 
 public class GUIUtils {
@@ -20,7 +19,7 @@ public class GUIUtils {
     private String registerTitle;
     private final List<Integer> clickedSlots;
     private String dynamicTitle;
-    private static final Logger logger = Logger.getLogger(GUIUtils.class.getName());
+    private String pinGUITitle;
 
     // Map to associate integers with symbols
     private static final Map<Integer, String> symbolMap = new HashMap<>();
@@ -55,6 +54,7 @@ public class GUIUtils {
     public void loadTitles(FileConfiguration config) {
         loginTitle = config.getString("LoginTitle");
         registerTitle = config.getString("RegisterTitle");
+        pinGUITitle = registerTitle;
         updateDynamicTitle();
     }
 
@@ -73,6 +73,7 @@ public class GUIUtils {
     public ItemStack createFillItem() {
         ItemStack item = new ItemStack(Material.MAP);
         ItemMeta itemMeta = item.getItemMeta();
+        assert itemMeta != null;
         itemMeta.setCustomModelData(1010);
         itemMeta.setDisplayName(ChatColor.RESET + "");
         item.setItemMeta(itemMeta);
@@ -99,28 +100,30 @@ public class GUIUtils {
             pinBuilder.append(clickedSlots.get(i));
         }
         String pin = pinBuilder.toString();
+        updateDynamicTitle();  // Update the dynamic title before clearing clickedSlots
         clickedSlots.clear();
-        updateDynamicTitle();
         return pin;
+    }
+
+    public String getPinGUITitle() {
+        return pinGUITitle;
+    }
+
+    public void setPinGUITitle(String pinGUITitle) {
+        this.pinGUITitle = pinGUITitle;
     }
 
     public String getDynamicTitle() {
         return dynamicTitle;
     }
 
-    public String getSymbolForSlot(int slot) {
-        return symbolMap.getOrDefault(slot, String.valueOf(slot));
-    }
 
     private void updateDynamicTitle() {
-        StringBuilder titleBuilder = new StringBuilder(loginTitle);
-        String dynamicTitle = titleBuilder.toString();
-
-        for (int i = 0; i < clickedSlots.size(); i++) {
-            String symbol = symbolMap.getOrDefault(clickedSlots.get(i), String.valueOf(clickedSlots.get(i)));
-            dynamicTitle = dynamicTitle.replaceFirst("\\섎", symbol);
+        String dynamicTitle = pinGUITitle;
+        for (Integer clickedSlot : clickedSlots) {
+            String symbol = symbolMap.getOrDefault(clickedSlot, String.valueOf(clickedSlot));
+            dynamicTitle = dynamicTitle.replaceFirst("섎", symbol);
         }
         this.dynamicTitle = dynamicTitle;
-        logger.info("Dynamic Title updated to: " + dynamicTitle); // Print dynamic title using logger
     }
 }
