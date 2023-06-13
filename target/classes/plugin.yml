@@ -11,4 +11,4 @@ commands:
 permissions:
   xauth.use:
     description: Allows players to use the /xauth command
-    default: true
+    default: false

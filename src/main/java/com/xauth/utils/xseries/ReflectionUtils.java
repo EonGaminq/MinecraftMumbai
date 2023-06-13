@@ -76,7 +76,7 @@ public final class ReflectionUtils {
                 // As a protection for forge+bukkit implementation that tend to mix versions.
                 // The real CraftPlayer should exist in the package.
                 // Note: Doesn't seem to function properly. Will need to separate the version
-                // handler for NMS and CraftBukkit for softwares like catmc.
+                // handler for NMS and CraftBukkit for software like catmc.
                 try {
                     Class.forName("org.bukkit.craftbukkit." + found + ".entity.CraftPlayer");
                     break;

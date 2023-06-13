@@ -11,13 +11,11 @@ import fr.xephi.authme.api.v3.AuthMeApi;
 import com.xauth.utils.GUIUtils;
 import com.xauth.xAuth;
 
-
 public class onGUIClose implements Listener {
 
     private final xAuth plugin;
     private final GUIUtils guiUtils;
     private final PinGUI pinGUI;
-
 
     public onGUIClose(xAuth plugin, GUIUtils guiUtils, PinGUI pinGUI) {
         this.plugin = plugin;
@@ -31,11 +29,11 @@ public class onGUIClose implements Listener {
         String inventoryTitle = event.getView().getTitle();
         String loginTitle = guiUtils.getLoginTitle();
         String registerTitle = guiUtils.getRegisterTitle();
-
         if (inventoryTitle.equals(loginTitle) || inventoryTitle.equals(registerTitle)) {
             Player player = (Player) event.getPlayer();
             BukkitScheduler scheduler = plugin.getServer().getScheduler();
             scheduler.scheduleSyncDelayedTask(plugin, () -> {
+                guiUtils.clearPinMap(player); // Clear the recorded PIN digits for the specific player in pinMap
                 if (!guiUtils.getClickedSlots().isEmpty()) {
                     guiUtils.getClickedSlots().clear(); // Clear the recorded PIN digits using the GUIUtils' clickedSlots list
                 }

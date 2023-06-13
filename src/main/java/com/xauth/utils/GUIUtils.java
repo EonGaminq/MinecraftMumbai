@@ -1,23 +1,23 @@
 package com.xauth.utils;
 
+import org.bukkit.entity.Player;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 public class GUIUtils {
 
     private String loginTitle;
     private String registerTitle;
     private final List<Integer> clickedSlots;
+    private final Map<Player, StringBuilder> pinMap;
     private String dynamicTitle;
     private String pinGUITitle;
 
@@ -55,8 +55,11 @@ public class GUIUtils {
         loginTitle = config.getString("LoginTitle");
         registerTitle = config.getString("RegisterTitle");
         pinGUITitle = registerTitle;
-        updateDynamicTitle();
+        for (Player player : pinMap.keySet()) {
+            updateDynamicTitle(player);
+        }
     }
+
 
     public int convertRawSlot(int slot) {
         return slotConversionMap.getOrDefault(slot, -1);
@@ -83,26 +86,25 @@ public class GUIUtils {
     public GUIUtils() {
         clickedSlots = new ArrayList<>();
         dynamicTitle = "";
+        pinMap = new HashMap<>();
     }
 
-    public void addClickedSlot(int slot) {
+    public void addClickedSlot(int slot, Player player) {
         clickedSlots.add(slot);
-        updateDynamicTitle();
+        updateDynamicTitle(player);
     }
+
 
     public List<Integer> getClickedSlots() {
         return clickedSlots;
     }
 
-    public String buildPIN() {
-        StringBuilder pinBuilder = new StringBuilder();
-        for (int i = 0; i < 4; i++) {
-            pinBuilder.append(clickedSlots.get(i));
-        }
-        String pin = pinBuilder.toString();
-        updateDynamicTitle();  // Update the dynamic title before clearing clickedSlots
-        clickedSlots.clear();
-        return pin;
+    public Map<Player, StringBuilder> getPinMap() {
+        return pinMap;
+    }
+
+    public void clearPinMap(Player player) {
+        pinMap.remove(player);
     }
 
     public String getPinGUITitle() {
@@ -117,13 +119,18 @@ public class GUIUtils {
         return dynamicTitle;
     }
 
-
-    private void updateDynamicTitle() {
+    private void updateDynamicTitle(Player player) {
         String dynamicTitle = pinGUITitle;
-        for (Integer clickedSlot : clickedSlots) {
-            String symbol = symbolMap.getOrDefault(clickedSlot, String.valueOf(clickedSlot));
-            dynamicTitle = dynamicTitle.replaceFirst("섎", symbol);
+        StringBuilder pinBuilder = pinMap.get(player);
+        if (pinBuilder != null) {
+            for (int i = 0; i < pinBuilder.length(); i++) {
+                int digit = Character.getNumericValue(pinBuilder.charAt(i));
+                String symbol = symbolMap.getOrDefault(digit, String.valueOf(digit));
+                dynamicTitle = dynamicTitle.replaceFirst("섎", symbol);
+            }
         }
         this.dynamicTitle = dynamicTitle;
     }
+
+
 }
