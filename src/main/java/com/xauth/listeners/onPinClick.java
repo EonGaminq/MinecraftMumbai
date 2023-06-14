@@ -8,23 +8,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.xauth.xAuth;
 import com.xauth.utils.GUIUtils;
 import com.xauth.utils.InventoryUpdate;
 
 import fr.xephi.authme.api.v3.AuthMeApi;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class onPinClick implements Listener {
 
-    private final xAuth plugin;
     private final GUIUtils guiUtils;
     private final Map<Player, StringBuilder> pinMap;
 
-    public onPinClick(xAuth plugin, GUIUtils guiUtils) {
-        this.plugin = plugin;
+    public onPinClick(GUIUtils guiUtils) {
         this.guiUtils = guiUtils;
         this.pinMap = guiUtils.getPinMap();
     }
@@ -32,7 +28,6 @@ public class onPinClick implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         boolean isLeftClick = event.isLeftClick();
-        boolean isRightClick = event.isRightClick();
 
         String inventoryTitle = event.getView().getTitle();
         if (!inventoryTitle.contains(guiUtils.getLoginTitle()) && !inventoryTitle.contains(guiUtils.getRegisterTitle())) {
@@ -51,10 +46,15 @@ public class onPinClick implements Listener {
         Player player = (Player) event.getWhoClicked();
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
         if (isLeftClick) {
+            if (!AuthMeApi.getInstance().isRegistered(player.getName())) {
+            guiUtils.setPinGUITitle(guiUtils.getRegisterTitle());
+                }
+                else if (AuthMeApi.getInstance().isRegistered(player.getName()) && !AuthMeApi.getInstance().isAuthenticated(player)) {
+                    guiUtils.setPinGUITitle(guiUtils.getLoginTitle());
+                }
             StringBuilder pinBuilder = pinMap.computeIfAbsent(player, k -> new StringBuilder());
             pinBuilder.append(convertedSlot);
             guiUtils.addClickedSlot(convertedSlot, player);
-            System.out.println(pinBuilder.toString());
             // Check if the PIN length is 4 after appending the digit
             if (pinBuilder.length() >= 4) {
                 String pin = pinBuilder.toString();
