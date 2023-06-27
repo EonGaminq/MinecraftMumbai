@@ -30,7 +30,7 @@ public class onPinClick implements Listener {
         boolean isLeftClick = event.isLeftClick();
 
         String inventoryTitle = event.getView().getTitle();
-        if (!inventoryTitle.contains(guiUtils.getLoginTitle()) && !inventoryTitle.contains(guiUtils.getRegisterTitle())) {
+        if (!inventoryTitle.contains(":offset_-16::ui_login:") && !inventoryTitle.contains(":offset_-16::ui_regis:")) {
             return; // Ignore non-relevant inventories
         }
         event.setCancelled(true);

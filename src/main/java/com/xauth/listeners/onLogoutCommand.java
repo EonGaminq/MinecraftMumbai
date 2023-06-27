@@ -1,6 +1,7 @@
 package com.xauth.listeners;
 
 import com.xauth.gui.PinGUI;
+import com.xauth.gui.LoginGUI;
 import com.xauth.utils.GUIUtils;
 import com.xauth.xAuth;
 import fr.xephi.authme.api.v3.AuthMeApi;
@@ -15,11 +16,13 @@ public class onLogoutCommand implements Listener {
     private final xAuth plugin;
     private final GUIUtils guiUtils;
     private final PinGUI pinGUI;
+    private final LoginGUI loginGUI;
 
-    public onLogoutCommand(xAuth plugin, GUIUtils guiUtils, PinGUI pinGUI) {
+    public onLogoutCommand(xAuth plugin, GUIUtils guiUtils, PinGUI pinGUI, LoginGUI loginGUI) {
         this.plugin = plugin;
         this.guiUtils = guiUtils;
         this.pinGUI = pinGUI;
+        this.loginGUI = loginGUI;
     }
 
     @EventHandler
@@ -31,7 +34,7 @@ public class onLogoutCommand implements Listener {
             scheduler.scheduleSyncDelayedTask(plugin, () -> {
                 if (!AuthMeApi.getInstance().isAuthenticated(player)) {
                     guiUtils.setPinGUITitle(guiUtils.getLoginTitle());
-                    pinGUI.open(player);
+                    loginGUI.open(player);
                 }
             }, 6);
         }

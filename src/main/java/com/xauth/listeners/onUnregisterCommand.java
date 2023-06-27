@@ -1,6 +1,7 @@
 package com.xauth.listeners;
 
 import com.xauth.gui.PinGUI;
+import com.xauth.gui.RegisterGUI;
 import com.xauth.utils.GUIUtils;
 import com.xauth.xAuth;
 import fr.xephi.authme.api.v3.AuthMeApi;
@@ -16,11 +17,13 @@ public class onUnregisterCommand implements Listener {
     private final xAuth plugin;
     private final GUIUtils guiUtils;
     private final PinGUI pinGUI;
+    private final RegisterGUI registerGUI;
 
-    public onUnregisterCommand(xAuth plugin, GUIUtils guiUtils, PinGUI pinGUI) {
+    public onUnregisterCommand(xAuth plugin, GUIUtils guiUtils, PinGUI pinGUI, RegisterGUI registerGUI) {
         this.plugin = plugin;
         this.guiUtils = guiUtils;
         this.pinGUI = pinGUI;
+        this.registerGUI = registerGUI;
     }
 
     @EventHandler
