@@ -18,7 +18,8 @@ public class GUIUtils {
     private String registerTitle;
     private final List<Integer> clickedSlots;
     private final Map<Player, StringBuilder> pinMap;
-    private String dynamicTitle;
+    private String loginDynamicTitle;
+    private String registerDynamicTitle;
     private String pinGUITitle;
 
     // Map to associate integers with symbols
@@ -54,9 +55,13 @@ public class GUIUtils {
     public void loadTitles(FileConfiguration config) {
         loginTitle = config.getString("LoginTitle");
         registerTitle = config.getString("RegisterTitle");
-        pinGUITitle = registerTitle;
+        pinGUITitle = loginTitle;
+        registerDynamicTitle = registerTitle;
         for (Player player : pinMap.keySet()) {
-            updateDynamicTitle(player);
+            updateLoginDynamicTitle(player);
+        }
+        for (Player player : pinMap.keySet()) {
+            updateRegisterDynamicTitle(player);
         }
     }
 
@@ -85,13 +90,15 @@ public class GUIUtils {
 
     public GUIUtils() {
         clickedSlots = new ArrayList<>();
-        dynamicTitle = "";
+        loginDynamicTitle = "";
+        registerDynamicTitle = "";
         pinMap = new HashMap<>();
     }
 
     public void addClickedSlot(int slot, Player player) {
         clickedSlots.add(slot);
-        updateDynamicTitle(player);
+        updateLoginDynamicTitle(player);
+        updateRegisterDynamicTitle(player);
     }
 
 
@@ -107,29 +114,39 @@ public class GUIUtils {
         pinMap.remove(player);
     }
 
-    public String getPinGUITitle() {
-        return pinGUITitle;
+
+    public String getLoginDynamicTitle() {
+        return loginDynamicTitle;
     }
 
-    public void setPinGUITitle(String pinGUITitle) {
-        this.pinGUITitle = pinGUITitle;
+    public String getRegisterDynamicTitle() {
+        return registerDynamicTitle;
     }
 
-    public String getDynamicTitle() {
-        return dynamicTitle;
-    }
-
-    private void updateDynamicTitle(Player player) {
-        String dynamicTitle = pinGUITitle;
+    private void updateLoginDynamicTitle(Player player) {
+        String loginDynamicTitle = loginTitle;
         StringBuilder pinBuilder = pinMap.get(player);
         if (pinBuilder != null) {
             for (int i = 0; i < pinBuilder.length(); i++) {
                 int digit = Character.getNumericValue(pinBuilder.charAt(i));
                 String symbol = symbolMap.getOrDefault(digit, String.valueOf(digit));
-                dynamicTitle = dynamicTitle.replaceFirst("섎", symbol);
+                loginDynamicTitle = loginDynamicTitle.replaceFirst("섎", symbol);
             }
         }
-        this.dynamicTitle = dynamicTitle;
+        this.loginDynamicTitle = loginDynamicTitle;
+    }
+
+    private void updateRegisterDynamicTitle(Player player) {
+        String  registerDynamicTitle = registerTitle;
+        StringBuilder pinBuilder = pinMap.get(player);
+        if (pinBuilder != null) {
+            for (int i = 0; i < pinBuilder.length(); i++) {
+                int digit = Character.getNumericValue(pinBuilder.charAt(i));
+                String symbol = symbolMap.getOrDefault(digit, String.valueOf(digit));
+                registerDynamicTitle = registerDynamicTitle.replaceFirst("섎", symbol);
+            }
+        }
+        this.registerDynamicTitle = registerDynamicTitle;
     }
 
 

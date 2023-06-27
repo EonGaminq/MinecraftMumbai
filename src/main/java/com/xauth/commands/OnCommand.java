@@ -42,7 +42,6 @@ public class OnCommand implements CommandExecutor {
             String argument = args[1];
 
             if (argument.equalsIgnoreCase("login")) {
-                plugin.getGuiUtils().setPinGUITitle(plugin.getGuiUtils().getLoginTitle());
                 PinGUI pinGUI = new PinGUI(plugin.getGuiUtils());
 
                 if (sender instanceof Player) {
@@ -52,7 +51,6 @@ public class OnCommand implements CommandExecutor {
 
                 return true;
             } else if (argument.equalsIgnoreCase("register")) {
-                plugin.getGuiUtils().setPinGUITitle(plugin.getGuiUtils().getRegisterTitle());
                 PinGUI pinGUI = new PinGUI(plugin.getGuiUtils());
 
                 if (sender instanceof Player) {

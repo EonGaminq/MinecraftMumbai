@@ -30,7 +30,6 @@ public class xAuth extends JavaPlugin implements CommandExecutor, Listener {
         saveConfig();
         guiUtils = new GUIUtils();
         guiUtils.loadTitles(getConfig()); // Load titles from the configuration file
-        guiUtils.setPinGUITitle(guiUtils.getRegisterTitle());
         pinGUI = new PinGUI(guiUtils); // Initialize the pinGUI object
         loginGUI = new LoginGUI(guiUtils);
         registerGUI = new RegisterGUI(guiUtils);

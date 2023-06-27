@@ -46,12 +46,6 @@ public class onPinClick implements Listener {
         Player player = (Player) event.getWhoClicked();
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
         if (isLeftClick) {
-            if (!AuthMeApi.getInstance().isRegistered(player.getName())) {
-            guiUtils.setPinGUITitle(guiUtils.getRegisterTitle());
-                }
-                else if (AuthMeApi.getInstance().isRegistered(player.getName()) && !AuthMeApi.getInstance().isAuthenticated(player)) {
-                    guiUtils.setPinGUITitle(guiUtils.getLoginTitle());
-                }
             StringBuilder pinBuilder = pinMap.computeIfAbsent(player, k -> new StringBuilder());
             pinBuilder.append(convertedSlot);
             guiUtils.addClickedSlot(convertedSlot, player);
@@ -63,7 +57,11 @@ public class onPinClick implements Listener {
                 executeAuthCommand(player, pin);
             }
         }
-        InventoryUpdate.updateInventory(player, guiUtils.getDynamicTitle());
+        if (AuthMeApi.getInstance().isRegistered(player.getName())) {
+            InventoryUpdate.updateInventory(player, guiUtils.getLoginDynamicTitle());
+        } else {
+            InventoryUpdate.updateInventory(player, guiUtils.getRegisterDynamicTitle());
+        }
     }
 
     private void executeAuthCommand(Player player, String pin) {

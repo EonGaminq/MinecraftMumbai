@@ -17,7 +17,7 @@ public class PinGUI {
     }
 
     public void open(Player player) {
-        Inventory pinGui = Bukkit.createInventory(null, 27, guiUtils.getPinGUITitle());
+        Inventory pinGui = Bukkit.createInventory(null, 27, guiUtils.getLoginDynamicTitle());
         for (int i = 0; i < pinGui.getSize(); i++) {
             ItemStack fillItemClone;
             if (isWithinClickableArea(i) || isFillItemSlot(i)) {

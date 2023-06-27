@@ -35,13 +35,9 @@ public class onPlayerJoinListener implements Listener {
         Status status = event.getStatus();
         if (status == Status.SUCCESSFULLY_LOADED) {
             if (!AuthMeApi.getInstance().isRegistered(player.getName())) {
-                guiUtils.setPinGUITitle(guiUtils.getRegisterTitle());
-                player.sendMessage("DEBUG: opening register gui");
                 registerGUI.open(player);
             }
             if (AuthMeApi.getInstance().isRegistered(player.getName()) && !AuthMeApi.getInstance().isAuthenticated(player)) {
-                guiUtils.setPinGUITitle(guiUtils.getLoginTitle());
-                player.sendMessage("DEBUG: opening login gui");
                 loginGUI.open(player);
             }
         } else if (status == Status.DECLINED || status == Status.FAILED_DOWNLOAD) {

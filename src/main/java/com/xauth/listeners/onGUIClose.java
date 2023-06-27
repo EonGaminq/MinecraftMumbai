@@ -42,7 +42,7 @@ public class onGUIClose implements Listener {
                     guiUtils.getClickedSlots().clear(); // Clear the recorded PIN digits using the GUIUtils' clickedSlots list
                 }
                 if (!AuthMeApi.getInstance().isRegistered(player.getName())) {
-                    pinGUI.open(player);
+                    registerGUI.open(player);
                 } else if (!AuthMeApi.getInstance().isAuthenticated(player)) {
                     loginGUI.open(player);
                 }
